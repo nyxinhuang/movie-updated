@@ -20,7 +20,7 @@ pip freeze > requirements.txt
 pip install -r requirements.txt
 ```
 
-#Usage
+# Usage
 
 Open this project movie-updated in Pycharm and make sure all requirements and dependencies are installed
 
@@ -42,7 +42,7 @@ top_10_directors_actors.csv
 top_10_actor_director_pair.csv
 ```
 
-#Test
+# Test
 
 Go to ```./test``` folder and run ```py.test``` from terminal  to do unit testing
 
