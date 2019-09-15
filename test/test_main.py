@@ -42,6 +42,13 @@ def test_top_10_directors_actors():
     df_a2 = df_actor2_profit.dropna()
     # df_a2.isnull().sum()
 
+    df_actor3_profit = df[['actor_3_name']]
+    df_actor3_profit['profit'] = (df['gross'] - df['budget']).tolist()
+    df_actor3_profit.rename(columns={'actor_3_name': 'name'}, inplace=True)
+    # df_actor3_profit.isnull().sum()
+    df_a3 = df_actor3_profit.dropna()
+    # df_a3.isnull().sum()
+
     df_actor1_profit = df[['actor_1_name']]
     df_actor1_profit['profit'] = (df['gross'] - df['budget']).tolist()
     df_actor1_profit.rename(columns={'actor_1_name': 'name'}, inplace=True)
@@ -56,7 +63,7 @@ def test_top_10_directors_actors():
     df_director = df_director_profit.dropna()
     # df_director.isnull().sum()
 
-    df_actors_director_profit = pd.concat([df_a1, df_a2, df_director])
+    df_actors_director_profit = pd.concat([df_a1, df_a2, df_director,df_a3])
     # df_actors_director_profit
     test_res = df_actors_director_profit.groupby(['name']).sum().sort_values(by='profit', ascending=False).head(10)
     print(test_res)
@@ -72,13 +79,19 @@ def test_top_10_directors_actors():
 
 def test_top_10_actor_director_pair():
     # use pandas to select column and do the data manipulation rather than sql
-    # select actor1 actor2 column with director and imdb score seperately and concatenate them to do the filter and sorting
+    # select actor1 actor2 actor3 column with director and imdb score seperately and concatenate them to do the filter and sorting
     df = pd.read_csv("../data/movie_metadata.csv")
+
+    df_actor3_director_imdb = df[['actor_3_name', 'director_name', 'imdb_score']]
     df_actor2_director_imdb = df[['actor_2_name', 'director_name', 'imdb_score']]
     df_actor1_director_imdb = df[['actor_1_name', 'director_name', 'imdb_score']]
+
+    df_actor3_director_imdb.rename(columns={'actor_3_name': 'actor_name'}, inplace=True)
     df_actor2_director_imdb.rename(columns={'actor_2_name': 'actor_name'}, inplace=True)
     df_actor1_director_imdb.rename(columns={'actor_1_name': 'actor_name'}, inplace=True)
-    df_actor_director_imdb = pd.concat([df_actor1_director_imdb, df_actor2_director_imdb]).dropna()
+
+    df_actor_director_imdb = pd.concat([df_actor1_director_imdb, df_actor2_director_imdb,df_actor3_director_imdb]).dropna()
+
     test_res = df_actor_director_imdb.sort_values(by='imdb_score', ascending=False).drop_duplicates(
         subset=['actor_name', 'director_name'], keep='first').head(10)
 
@@ -109,10 +122,10 @@ def top_10_genres(data):
 def top_10_directors_actors(data):
     # Profit = gross - budget
     data = engine.execute(
-        "SELECT actor_1_name as name, gross-budget FROM movie UNION ALL SELECT director_name as name, gross-budget FROM movie union all SELECT actor_2_name as name, gross-budget FROM movie").fetchall()
+        "SELECT actor_1_name as name, gross-budget FROM movie UNION ALL SELECT director_name as name, gross-budget FROM movie UNION ALL SELECT actor_2_name as name, gross-budget FROM movie UNION ALL SELECT actor_3_name as name, gross-budget FROM movie").fetchall()
     df = DataFrame.from_records(data)
     df.columns = ['name', 'profit']
-    print("Top 10 directors by profit")
+    print("Top 10 directors/actors by profit")
     top10_res = df.groupby(['name']).sum().sort_values(by='profit', ascending=False).head(10)
     print(top10_res)
     res = top10_res.to_csv("../result/top_10_directors_actors.csv", encoding='utf-8')
@@ -124,7 +137,7 @@ def top_10_directors_actors(data):
 
 def top_10_actor_director_pair(data):
     data = engine.execute(
-        "SELECT actor_1_name, director_name, imdb_score FROM movie UNION ALL SELECT actor_2_name, director_name, imdb_score FROM movie").fetchall()
+        "SELECT actor_1_name, director_name, imdb_score FROM movie UNION ALL SELECT actor_2_name, director_name, imdb_score FROM movie UNION ALL SELECT actor_3_name, director_name, imdb_score FROM movie").fetchall()
     df = DataFrame.from_records(data)
     df.columns = ['actor_name', 'director_name','imdb_score']
     top10_res = df.dropna().sort_values(by='imdb_score', ascending=False).drop_duplicates(subset=['actor_name', 'director_name'],keep='first').head(10)

@@ -1,0 +1,3 @@
+#!/Users/brucexhuang/workspace/movie-updated/env/bin/python
+from numba.pycc import main
+main()

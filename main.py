@@ -36,7 +36,7 @@ def top_10_genres(data):
 def top_10_directors_actors(data):
     # Profit = gross - budget
     data = engine.execute(
-        "SELECT actor_1_name as name, gross-budget FROM movie UNION ALL SELECT director_name as name, gross-budget FROM movie union all SELECT actor_2_name as name, gross-budget FROM movie").fetchall()
+        "SELECT actor_1_name as name, gross-budget FROM movie UNION ALL SELECT director_name as name, gross-budget FROM movie UNION ALL SELECT actor_2_name as name, gross-budget FROM movie UNION ALL SELECT actor_3_name as name, gross-budget FROM movie").fetchall()
     df = DataFrame.from_records(data)
     df.columns = ['name', 'profit']
     print("Top 10 directors/actors by profit")
@@ -51,7 +51,7 @@ def top_10_directors_actors(data):
 
 def top_10_actor_director_pair(data):
     data = engine.execute(
-        "SELECT actor_1_name, director_name, imdb_score FROM movie UNION ALL SELECT actor_2_name, director_name, imdb_score FROM movie").fetchall()
+        "SELECT actor_1_name, director_name, imdb_score FROM movie UNION ALL SELECT actor_2_name, director_name, imdb_score FROM movie UNION ALL SELECT actor_3_name, director_name, imdb_score FROM movie").fetchall()
     df = DataFrame.from_records(data)
     df.columns = ['actor_name', 'director_name','imdb_score']
     top10_res = df.dropna().sort_values(by='imdb_score', ascending=False).drop_duplicates(subset=['actor_name', 'director_name'],keep='first').head(10)
