@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from pandas import DataFrame
 
 # read in csv file from pandas library
-input = pd.read_csv("movie_metadata.csv")
+input = pd.read_csv("./data/movie_metadata.csv")
 # initiate sqlit in-memory database
 engine = create_engine('sqlite://', echo=False)
 # load file to local database
@@ -26,7 +26,7 @@ def top_10_genres(data):
     df.columns = ['genres', 'profit']
     print("Top 10 genres by profit")
     print(df)
-    res = df.to_csv("top_10_genres.csv", encoding='utf-8', index=False)
+    res = df.to_csv("./result/top_10_genres.csv", encoding='utf-8', index=False)
     return res
 
 
@@ -39,10 +39,10 @@ def top_10_directors_actors(data):
         "SELECT actor_1_name as name, gross-budget FROM movie UNION ALL SELECT director_name as name, gross-budget FROM movie union all SELECT actor_2_name as name, gross-budget FROM movie").fetchall()
     df = DataFrame.from_records(data)
     df.columns = ['name', 'profit']
-    print("Top 10 directors by profit")
+    print("Top 10 directors/actors by profit")
     top10_res = df.groupby(['name']).sum().sort_values(by='profit', ascending=False).head(10)
     print(top10_res)
-    res = top10_res.to_csv("top_10_directors_actors.csv", encoding='utf-8')
+    res = top10_res.to_csv("./result/top_10_directors_actors.csv", encoding='utf-8')
     return res
 
 # the best actor, director pairs (up to 10) that have the highest IMDB_ratings
@@ -57,7 +57,7 @@ def top_10_actor_director_pair(data):
     top10_res = df.dropna().sort_values(by='imdb_score', ascending=False).drop_duplicates(subset=['actor_name', 'director_name'],keep='first').head(10)
     print("Top 10 actor-director pair by IMDB score")
     print(top10_res)
-    res = top10_res.to_csv("top_10_actor_director_pair.csv", encoding='utf-8', index=False)
+    res = top10_res.to_csv("./result/top_10_actor_director_pair.csv", encoding='utf-8', index=False)
     return res
 
 if __name__ == "__main__":
